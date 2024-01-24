@@ -1,5 +1,8 @@
+## Project Proposal
 
-## Data Dictionary
+https://docs.google.com/document/d/1E1dpwIcaMIw0ZYkn9mnputE9TXR5RFdZGAdOf2r_vPU/edit?usp=sharing
+
+## NYT Data Dictionary
 
 ```
 abstract: This column contains a brief summary  of the article. It gives a 
