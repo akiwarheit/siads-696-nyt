@@ -3,40 +3,18 @@ import pandas as pd
 from gensim.corpora.dictionary import Dictionary
 from gensim.models.coherencemodel import CoherenceModel
 from sklearn.metrics import make_scorer
+from gensim.test.utils import common_dictionary, common_texts
 
-with open('out/count_vectorizer.pkl', 'rb') as f:
-    vectorizer = pickle.load(f)
-
-# Dictionary can accept an iterable of iterable str.
-#
-# documents : iterable of iterable of str, optional
-#     Documents to be used to initialize the mapping and collect corpus statistics.
-# prune_at : int, optional
-#     Dictionary will try to keep no more than `prune_at` words in its mapping, to limit its RAM
-#     footprint, the correctness is not guaranteed.
-#     Use :meth:`~gensim.corpora.dictionary.Dictionary.filter_extremes` to perform proper filtering.
-
-# Examples
-# --------
-# .. sourcecode:: pycon
-
-#     >>> from gensim.corpora import Dictionary
-#     >>>
-#     >>> texts = [['human', 'interface', 'computer']]
-#     >>> dct = Dictionary(texts)  # initialize a Dictionary
-#     >>> dct.add_documents([["cat", "say", "meow"], ["dog"]])  # add more document (extend the vocabulary)
-#     >>> dct.doc2bow(["dog", "computer", "non_existent_word"])
-#     [(0, 1), (6, 1)]
-def calc_coherence(words, texts):
-    dictionary = Dictionary(texts)
+def calc_coherence(topics, texts, dictionary):
+    dictionary = Dictionary(dictionary)
 
     chmodel = CoherenceModel(
-        topics=words, texts=texts, dictionary=dictionary, coherence='c_v'
+        topics=topics, texts=texts, dictionary=dictionary, coherence='c_v'
     )
 
     return chmodel.get_coherence()
 
-def get_topic_words(model, num_top_words=50):
+def get_topic_words(model, vectorizer, num_top_words=50):
     feature_names = vectorizer.get_feature_names_out()
 
     topic_words = []
@@ -47,9 +25,9 @@ def get_topic_words(model, num_top_words=50):
 
     return topic_words
 
-def create_coherence_scorer(dictionary):
+def create_coherence_scorer(dictionary, vectorizer):
     def coherence_score(model, X, y, **kwargs):
-        topic_words = get_topic_words(model)
+        topic_words = get_topic_words(model, vectorizer)
         coherence_score = calc_coherence(topic_words, [dictionary])
 
         return coherence_score
